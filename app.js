@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'asset-assurance-state-v2';
+const STORAGE_KEY = 'asset-assurance-state-v3';
 const SOURCE_WEIGHTS = { physical:45, endpoint:35, network:30, owner:25, procurement:15, cmdb:10 };
 const SOURCE_LABELS = { physical:'Physical audit', endpoint:'Endpoint management', network:'Network discovery', owner:'Owner confirmation', procurement:'Procurement', cmdb:'CMDB' };
 const CRITICALITY = { Low:1, Medium:2, High:3, Critical:4 };
@@ -14,7 +14,15 @@ const seedAssets = [
   asset('SR-AP-0044','Wireless AP — Floor 3','Network','SN-AP0044','Infrastructure','SLC HQ / Floor 3','High',false,[ev('network','2026-08-25','Controller inventory and MAC match'),ev('physical','2026-08-24','Ceiling location verified')]),
   asset('SR-PRN-0021','Laser Printer — HR','Printer','SN-PRN0021','HR','SLC HQ / HR','Low',false,[ev('network','2026-08-13','Print server check-in'),ev('cmdb','2026-08-10','Department record matches')]),
   asset('SR-TAB-0063','Warehouse Tablet','Tablet','SN-TAB0063','Operations','West Warehouse','Medium',true,[ev('endpoint','2026-02-08','MDM record has stale location')],investigation('assigned','Alex Morgan','Ask shift lead to scan the asset tag','2026-09-06')),
-  asset('SR-SRV-0017','Backup Appliance','Server','SN-BA0017','Infrastructure','DR Site','Critical',false,[ev('endpoint','2026-08-21','Backup console heartbeat'),ev('network','2026-08-21','Expected IP and MAC observed'),ev('physical','2026-08-15','Rack audit confirmed')])
+  asset('SR-SRV-0017','Backup Appliance','Server','SN-BA0017','Infrastructure','DR Site','Critical',false,[ev('endpoint','2026-08-21','Backup console heartbeat'),ev('network','2026-08-21','Expected IP and MAC observed'),ev('physical','2026-08-15','Rack audit confirmed')]),
+  asset('SR-WS-0204','Engineering Workstation','Desktop','SN-WS0204','Noah Williams','Provo Office / Engineering','High',false,[ev('endpoint','2026-09-01','EDR check-in matched assigned user'),ev('physical','2026-08-26','Asset tag verified during desk audit')]),
+  asset('SR-PHN-0106','Executive Mobile Phone','Phone','SN-PHN0106','Elena Garcia','Remote / Denver','High',false,[ev('endpoint','2026-08-31','MDM check-in reported healthy device'),ev('owner','2026-08-31','Custodian confirmed possession')]),
+  asset('SR-UPS-0009','Data Center UPS','Power','SN-UPS0009','Infrastructure','SLC HQ / Server Room','Critical',false,[ev('network','2026-09-02','Monitoring platform reported expected management IP'),ev('physical','2026-08-20','Rack and serial number verified')]),
+  asset('SR-LT-0126','Remote Contractor Laptop','Laptop','SN-LT0126','Unknown','Unknown','High',false,[ev('endpoint','2025-11-12','Last EDR check-in before contract ended')],investigation('unassigned','','Review contractor offboarding and shipping records','2026-09-10')),
+  asset('SR-SEC-0031','Warehouse Badge Reader','Security','SN-SEC0031','Physical Security','West Warehouse / North Door','High',false,[ev('network','2026-08-29','Expected MAC address observed on security VLAN'),ev('cmdb','2026-08-14','Installed location recorded')]),
+  asset('SR-PROJ-0015','Training Room Projector','Projector','SN-PROJ0015','Learning & Development','SLC HQ / Training Room','Low',false,[ev('physical','2026-08-18','Asset tag visible in room audit photo')]),
+  asset('SR-SAN-0003','Primary Storage Array','Storage','SN-SAN0003','Infrastructure','SLC HQ / Data Center','Critical',false,[ev('endpoint','2026-09-03','Storage console heartbeat and serial match'),ev('network','2026-09-03','Management IP observed'),ev('physical','2026-08-22','Rack position and asset tag verified')]),
+  asset('SR-TAB-0084','Field Services iPad','Tablet','SN-TAB0084','Field Services','Unknown','Medium',false,[ev('procurement','2025-10-06','Purchase order is the only available record')],investigation('assigned','Priya Shah','Check Apple Business Manager and contact field supervisor','2026-09-09'))
 ];
 
 function asset(id,name,type,serial,owner,location,criticality,conflict,evidence,investigationData=null){
@@ -74,7 +82,7 @@ function renderDashboard(){
     ['High-risk exposure',highRisk,'Critical or high risk','unknown']
   ].map(([label,value,sub,tone])=>`<div class="card ${tone}"><div class="label">${label}</div><div class="value">${value}</div><div class="sub">${sub}</div></div>`).join('');
   document.getElementById('assurance-score').innerHTML=`<b>${assurance}%</b><small>index</small>`;
-  document.getElementById('assurance-chart').innerHTML=barChart(['verified','probable','unknown'],k=>counts[k],rows.length,k=>k);
+  document.getElementById('assurance-chart').innerHTML=assuranceChart(counts,rows.length);
   const risks={critical:0,high:0,medium:0,low:0}; rows.forEach(a=>risks[a.risk]++);
   document.getElementById('risk-chart').innerHTML=barChart(['critical','high','medium','low'],k=>risks[k],rows.length,k=>k);
   const priority=rows.filter(a=>a.risk!=='low'&&(a.tier!=='verified'||a.investigation)).sort((a,b)=>b.riskScore-a.riskScore).slice(0,5);
@@ -86,6 +94,15 @@ function renderDashboard(){
 }
 function barChart(keys,getValue,total,getClass){
   return keys.map(k=>{const v=getValue(k);return `<div class="bar-row"><span>${title(k)}</span><div class="bar-track"><div class="bar ${getClass(k)}" style="width:${total?Math.max(v?3:0,v/total*100):0}%"></div></div><b>${v}</b></div>`}).join('');
+}
+function assuranceChart(counts,total){
+  const descriptions={verified:'Confirmed and current',probable:'Needs confirmation',unknown:'Location or custody unclear'};
+  const bars=['verified','probable','unknown'].map(tier=>{
+    const count=counts[tier],percent=total?Math.round(count/total*100):0;
+    return `<div class="bar-row assurance-row"><span><b>${title(tier)}</b><small>${descriptions[tier]}</small></span><div class="bar-track"><div class="bar ${tier}" style="width:${percent}%"></div></div><strong>${count} <small>${percent}%</small></strong></div>`;
+  }).join('');
+  const accounted=total?Math.round((counts.verified+counts.probable)/total*100):0;
+  return bars+`<div class="chart-insight"><b>${accounted}% have supporting evidence</b><span>${counts.unknown} of ${total} assets still require location or custody investigation.</span></div>`;
 }
 function assetName(id){ return state.assets.find(a=>a.id===id)?.name||id; }
 function formatDate(value){ return new Intl.DateTimeFormat('en-US',{year:'numeric',month:'short',day:'numeric'}).format(new Date(value)); }
