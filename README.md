@@ -3,7 +3,7 @@
 [![Deploy to GitHub Pages](https://github.com/Natethehobbyguy/asset-assurance-dashboard/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Natethehobbyguy/asset-assurance-dashboard/actions/workflows/deploy-pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-An evidence-driven IT asset management portfolio project that answers a practical interview question:
+An evidence-driven IT asset management portfolio project that answers a practical question:
 
 > How would you identify the assets you know are accounted for, those you are reasonably confident about, and those whose location or custody is unknown?
 
