@@ -1,0 +1,5 @@
+id,name,type,serial,owner,location,criticality,evidence_source,evidence_date,evidence_note
+SR-LT-0200,Design Team Laptop,Laptop,SN-DESIGN200,Avery Brooks,SLC HQ / Design,High,endpoint,2026-09-02,EDR check-in matched serial and assigned user
+SR-LT-0200,Design Team Laptop,Laptop,SN-DESIGN200,Avery Brooks,SLC HQ / Design,High,owner,2026-09-03,Custodian confirmed possession and location
+SR-CAM-0012,Loading Dock Camera,Security,SN-CAM0012,Physical Security,West Warehouse,Critical,network,2026-08-30,Expected MAC address observed on security VLAN
+SR-PHN-0088,Unassigned Mobile Phone,Phone,SN-PHN0088,Unassigned,Unknown,Medium,procurement,2026-02-11,Purchase order found but no current assignment
