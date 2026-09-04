@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Assurance Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">AA</div>
+      <div><strong>Asset Assurance</strong><span>Summit Ridge Co.</span></div>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="assets">Asset Inventory</button>
+      <button class="nav-btn" data-view="discovery">Discovery Queue</button>
+      <button class="nav-btn" data-view="methodology">Methodology</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="dashboard" class="view active-view">
+      <div class="page-heading">
+        <div><p class="eyebrow">ASSET VISIBILITY PROGRAM</p><h1>Know what you own. Know where it is.</h1><p class="muted">A practical workflow for reconciling asset records, evidence, and physical reality.</p></div>
+        <button id="reset-data" class="secondary-btn">Reset Demo Data</button>
+      </div>
+      <div class="cards" id="summary-cards"></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-heading"><div><h2>Asset assurance</h2><p class="muted">Confidence by inventory tier</p></div></div>
+          <div id="assurance-chart" class="chart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading"><div><h2>Priority actions</h2><p class="muted">Start where uncertainty and business impact overlap.</p></div></div>
+          <div id="priority-list"></div>
+        </div>
+      </div>
+      <div class="panel"><div class="panel-heading"><div><h2>Recent verification activity</h2><p class="muted">The evidence trail behind inventory confidence.</p></div><button class="text-btn" data-view="assets">View inventory →</button></div><div id="activity-list"></div></div>
+    </section>
+
+    <section id="assets" class="view">
+      <div class="page-heading"><div><p class="eyebrow">INVENTORY</p><h1>Asset inventory</h1><p class="muted">Search, filter, inspect evidence, and verify records.</p></div><button id="add-asset" class="primary-btn">+ Add Asset</button></div>
+      <div class="toolbar"><input id="search" type="search" placeholder="Search asset, owner, serial, location…" /><select id="tier-filter"><option value="all">All confidence levels</option><option value="verified">Verified</option><option value="probable">Probable</option><option value="unknown">Unknown</option></select><select id="type-filter"><option value="all">All asset types</option></select></div>
+      <div class="panel table-panel"><table><thead><tr><th>Asset</th><th>Type</th><th>Confidence</th><th>Location</th><th>Owner</th><th>Last evidence</th><th></th></tr></thead><tbody id="asset-table"></tbody></table></div>
+    </section>
+
+    <section id="discovery" class="view">
+      <div class="page-heading"><div><p class="eyebrow">REMEDIATION</p><h1>Discovery queue</h1><p class="muted">Unknown assets are not just data-quality problems—they are investigation tasks.</p></div></div>
+      <div class="panel"><div class="panel-heading"><div><h2>Unknown and high-risk assets</h2><p class="muted">Work from strongest lead to weakest lead.</p></div></div><div id="discovery-list"></div></div>
+      <div class="grid-2"><div class="panel"><h2>Suggested discovery sources</h2><div class="source-row"><strong>01</strong><span><b>Network discovery</b><small>DHCP, switches, Wi-Fi, MAC addresses</small></span></div><div class="source-row"><strong>02</strong><span><b>Endpoint management</b><small>EDR / MDM / RMM check-ins</small></span></div><div class="source-row"><strong>03</strong><span><b>Procurement & finance</b><small>Purchase orders, warranties, disposal records</small></span></div><div class="source-row"><strong>04</strong><span><b>Human verification</b><small>Physical walk-throughs and owner confirmation</small></span></div></div><div class="panel"><h2>Verification rule</h2><p class="large-quote">“Don't promote an asset to Verified because one field looks right.”</p><p class="muted">Verified means the location, identity, and ownership/evidence trail agree. A stale record can be informative without being authoritative.</p></div></div>
+    </section>
+
+    <section id="methodology" class="view">
+      <div class="page-heading"><div><p class="eyebrow">THE FRAMEWORK</p><h1>Three levels of confidence</h1><p class="muted">The goal isn't a perfect spreadsheet. The goal is a defensible understanding of the environment.</p></div></div>
+      <div class="method-grid"><div class="method-card verified"><span>01</span><h2>Verified</h2><p>We know the asset exists, where it is, and the supporting information is current.</p><ul><li>Recent telemetry or physical verification</li><li>Serial / hostname matches</li><li>Owner or custodian confirmed</li></ul></div><div class="method-card probable"><span>02</span><h2>Probable</h2><p>We have strong evidence, but something is stale, indirect, or awaiting confirmation.</p><ul><li>Recent-but-not-current telemetry</li><li>Conflicting metadata</li><li>Ownership inferred from records</li></ul></div><div class="method-card unknown"><span>03</span><h2>Unknown</h2><p>We cannot confidently establish the asset's current location, identity, or custody.</p><ul><li>No recent check-in</li><li>Conflicting or missing records</li><li>Requires investigation</li></ul></div></div>
+      <div class="panel"><h2>How I would answer the interview question</h2><ol class="answer-steps"><li><b>Normalize the inventory.</b> Establish one canonical asset ID and reconcile duplicates across systems.</li><li><b>Collect evidence.</b> Compare CMDB records to endpoint telemetry, network discovery, procurement, assignment records, and physical audits.</li><li><b>Score confidence.</b> Put every asset into Verified, Probable, or Unknown based on evidence quality—not intuition.</li><li><b>Prioritize remediation.</b> Focus first on unknown assets with high security, financial, or operational impact.</li><li><b>Close the loop.</b> Verification should update the source of truth and create an audit trail so the same problem doesn't recur.</li></ol></div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden"><div class="modal-card"><div class="modal-heading"><h2 id="modal-title">Asset</h2><button id="close-modal" class="icon-btn">×</button></div><div id="modal-body"></div></div></div>
+  <script src="app.js"></script>
+</body>
+</html>
